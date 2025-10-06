@@ -1,8 +1,21 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const CTA = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleClick = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/auth");
+    }
+  };
+
   return (
     <section className="py-24 px-4 relative overflow-hidden">
       {/* Animated background */}
@@ -63,8 +76,8 @@ const CTA = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Button variant="hero" size="lg" className="text-lg px-10 py-7 animate-glow-pulse">
-              Create My Flashcards
+            <Button variant="hero" size="lg" className="text-lg px-10 py-7 animate-glow-pulse" onClick={handleClick}>
+              {user ? "Go to Dashboard" : "Create My Flashcards"}
             </Button>
           </motion.div>
 

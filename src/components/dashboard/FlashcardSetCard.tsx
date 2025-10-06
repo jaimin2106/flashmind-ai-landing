@@ -1,0 +1,53 @@
+import { motion } from "framer-motion";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Edit, Trash2 } from "lucide-react";
+import { FlashcardSet } from "@/types/flashcards";
+import { formatDistanceToNow } from "date-fns";
+
+interface FlashcardSetCardProps {
+  set: FlashcardSet;
+  cardCount: number;
+  onStudy: (setId: string) => void;
+  onEdit: (setId: string) => void;
+  onDelete: (setId: string) => void;
+}
+
+export function FlashcardSetCard({ set, cardCount, onStudy, onEdit, onDelete }: FlashcardSetCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Card className="glass h-full flex flex-col">
+        <CardHeader>
+          <CardTitle className="line-clamp-1">{set.title}</CardTitle>
+          <CardDescription className="line-clamp-2">
+            {set.description || "No description"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 flex flex-col justify-between">
+          <div className="text-sm text-muted-foreground mb-4">
+            <p>{cardCount} {cardCount === 1 ? "card" : "cards"}</p>
+            <p>Updated {formatDistanceToNow(new Date(set.updated_at), { addSuffix: true })}</p>
+          </div>
+
+          <div className="flex gap-2">
+            <Button onClick={() => onStudy(set.id)} className="flex-1 gap-2">
+              <BookOpen className="w-4 h-4" />
+              Study
+            </Button>
+            <Button onClick={() => onEdit(set.id)} variant="outline" size="icon">
+              <Edit className="w-4 h-4" />
+            </Button>
+            <Button onClick={() => onDelete(set.id)} variant="outline" size="icon">
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}

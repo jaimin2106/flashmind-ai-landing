@@ -1,8 +1,21 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Zap, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/auth");
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero">
       {/* Animated background elements */}
@@ -83,8 +96,8 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Button variant="hero" size="lg" className="text-lg px-8 py-6">
-              Get Started
+            <Button variant="hero" size="lg" className="text-lg px-8 py-6" onClick={handleGetStarted}>
+              {user ? "Go to Dashboard" : "Get Started"}
             </Button>
             <Button variant="heroOutline" size="lg" className="text-lg px-8 py-6">
               Watch Demo
