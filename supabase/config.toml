@@ -1,1 +1,4 @@
 project_id = "nuthbekkjsdlhvbcmnat"
+
+[functions.generate-flashcards]
+verify_jwt = false
