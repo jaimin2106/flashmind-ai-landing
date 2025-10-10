@@ -30,7 +30,20 @@ serve(async (req) => {
       );
     }
 
-    const systemPrompt = `You are an expert educator creating study flashcards. Generate exactly ${count} high-quality flashcard question-answer pairs from the provided content.
+    console.log('Calling Perplexity API with', { textLength: text.length, count, difficulty });
+
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${perplexityApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'sonar-pro',
+        messages: [
+          {
+            role: 'user',
+            content: `You are an expert educator creating study flashcards. Generate exactly ${count} high-quality flashcard question-answer pairs from the provided content.
 
 Requirements:
 - Create ${count} flashcards at ${difficulty} difficulty level
@@ -43,26 +56,11 @@ Format your response as a JSON array:
 [
   {"question": "question text here", "answer": "answer text here"},
   {"question": "question text here", "answer": "answer text here"}
-]`;
+]
 
-    console.log('Calling Perplexity API with', { textLength: text.length, count, difficulty });
+Content to generate flashcards from:
 
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${perplexityApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-sonar-large-128k-online',
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          {
-            role: 'user',
-            content: `Generate ${count} flashcards from this content:\n\n${text.slice(0, 8000)}`
+${text.slice(0, 8000)}`
           }
         ],
         temperature: 0.7,
