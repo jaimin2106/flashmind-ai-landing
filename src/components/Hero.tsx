@@ -96,10 +96,10 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Button variant="hero" size="lg" className="text-lg px-8 py-6" onClick={handleGetStarted}>
+            <Button variant="default" size="lg" className="text-lg px-8 py-6" onClick={handleGetStarted}>
               {user ? "Go to Dashboard" : "Get Started"}
             </Button>
-            <Button variant="heroOutline" size="lg" className="text-lg px-8 py-6">
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6">
               Watch Demo
             </Button>
           </motion.div>

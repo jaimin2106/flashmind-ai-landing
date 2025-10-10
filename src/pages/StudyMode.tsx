@@ -78,7 +78,7 @@ export default function StudyMode() {
 
   if (loading) {
     return (
-      <div className="min-h-screen gradient-hero">
+      <div className="min-h-screen bg-background">
         <DashboardNav onCreateNew={() => navigate("/dashboard/create")} />
         <div className="flex items-center justify-center min-h-[60vh]">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -89,7 +89,7 @@ export default function StudyMode() {
 
   if (flashcards.length === 0) {
     return (
-      <div className="min-h-screen gradient-hero">
+      <div className="min-h-screen bg-background">
         <DashboardNav onCreateNew={() => navigate("/dashboard/create")} />
         <div className="container mx-auto px-4 py-8 text-center">
           <p className="text-xl mb-4">This set doesn't have any flashcards yet</p>
@@ -102,48 +102,46 @@ export default function StudyMode() {
   const currentCard = flashcards[currentIndex];
 
   return (
-    <div className="min-h-screen gradient-hero">
+    <div className="min-h-screen bg-background">
       <DashboardNav onCreateNew={() => navigate("/dashboard/create")} />
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
         >
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">{set?.title}</h1>
-            <p className="text-muted-foreground">
-              Card {currentIndex + 1} of {flashcards.length}
-            </p>
-            <Progress value={progress} className="mt-4" />
+          <div className="mb-12">
+            <h1 className="text-3xl font-semibold mb-4">{set?.title}</h1>
+            <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
+              <span>Card {currentIndex + 1} of {flashcards.length}</span>
+              <span>{Math.round(progress)}% Complete</span>
+            </div>
+            <Progress value={progress} className="h-2" />
           </div>
 
-          <div className="mb-8 perspective-1000">
+          <div className="mb-12">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentCard.id + isFlipped}
-                initial={{ rotateY: 0 }}
-                animate={{ rotateY: isFlipped ? 180 : 0 }}
-                transition={{ duration: 0.6 }}
-                style={{ transformStyle: "preserve-3d" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 className="cursor-pointer"
                 onClick={() => setIsFlipped(!isFlipped)}
               >
-                <Card className="glass min-h-[400px] flex items-center justify-center p-8 backface-hidden">
-                  <CardContent>
-                    <div
-                      className="text-center"
-                      style={{
-                        transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-                      }}
-                    >
-                      <p className="text-sm text-muted-foreground mb-4">
+                <Card className="border border-border bg-card shadow-lg min-h-[400px] flex items-center justify-center p-12">
+                  <CardContent className="w-full">
+                    <div className="text-center space-y-8">
+                      <div className="inline-block px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">
                         {isFlipped ? "Answer" : "Question"}
+                      </div>
+                      <p className="text-2xl font-medium leading-relaxed">
+                        {isFlipped ? currentCard.answer : currentCard.question}
                       </p>
-                      <p className="text-2xl">{isFlipped ? currentCard.answer : currentCard.question}</p>
-                      <p className="text-sm text-muted-foreground mt-8">
-                        Click card to {isFlipped ? "see question" : "reveal answer"}
+                      <p className="text-sm text-muted-foreground">
+                        Click to {isFlipped ? "see question" : "reveal answer"}
                       </p>
                     </div>
                   </CardContent>

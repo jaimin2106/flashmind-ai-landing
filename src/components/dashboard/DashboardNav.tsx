@@ -22,11 +22,11 @@ export function DashboardNav({ onCreateNew }: { onCreateNew: () => void }) {
   };
 
   return (
-    <nav className="border-b border-border bg-card">
+    <nav className="border-b border-border bg-background">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/dashboard")}>
           <Zap className="w-6 h-6 text-primary" />
-          <span className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <span className="text-xl font-semibold text-foreground">
             FlashMind
           </span>
         </div>

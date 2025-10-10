@@ -76,7 +76,7 @@ const CTA = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Button variant="hero" size="lg" className="text-lg px-10 py-7 animate-glow-pulse" onClick={handleClick}>
+            <Button variant="default" size="lg" className="text-lg px-10 py-7" onClick={handleClick}>
               {user ? "Go to Dashboard" : "Create My Flashcards"}
             </Button>
           </motion.div>

@@ -16,26 +16,31 @@ interface FlashcardSetCardProps {
 export function FlashcardSetCard({ set, cardCount, onStudy, onEdit, onDelete }: FlashcardSetCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ scale: 1.02 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
+      className="group"
     >
-      <Card className="glass h-full flex flex-col">
-        <CardHeader>
-          <CardTitle className="line-clamp-1">{set.title}</CardTitle>
-          <CardDescription className="line-clamp-2">
+      <Card className="h-full flex flex-col border border-border bg-card shadow-sm hover:shadow-md transition-shadow duration-200">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl font-semibold line-clamp-1">{set.title}</CardTitle>
+          <CardDescription className="line-clamp-2 text-sm">
             {set.description || "No description"}
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col justify-between">
-          <div className="text-sm text-muted-foreground mb-4">
-            <p>{cardCount} {cardCount === 1 ? "card" : "cards"}</p>
-            <p>Updated {formatDistanceToNow(new Date(set.updated_at), { addSuffix: true })}</p>
+        <CardContent className="flex-1 flex flex-col justify-between pt-0">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+            <div className="flex items-center gap-1">
+              <BookOpen className="w-4 h-4" />
+              <span>{cardCount} {cardCount === 1 ? "card" : "cards"}</span>
+            </div>
+            <div className="text-xs">
+              Updated {formatDistanceToNow(new Date(set.updated_at), { addSuffix: true })}
+            </div>
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={() => onStudy(set.id)} className="flex-1 gap-2">
+            <Button onClick={() => onStudy(set.id)} className="flex-1 gap-2" size="default">
               <BookOpen className="w-4 h-4" />
               Study
             </Button>

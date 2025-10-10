@@ -106,7 +106,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen gradient-hero">
+      <div className="min-h-screen bg-background">
         <DashboardNav onCreateNew={handleCreateNew} />
         <div className="flex items-center justify-center min-h-[60vh]">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -116,32 +116,40 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen gradient-hero">
+    <div className="min-h-screen bg-background">
       <DashboardNav onCreateNew={handleCreateNew} />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12 max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
         >
-          <h1 className="text-4xl font-bold mb-2">My Flashcard Sets</h1>
-          <p className="text-muted-foreground mb-8">
-            Create, manage, and study your flashcards
-          </p>
+          <div className="mb-12">
+            <h1 className="text-3xl font-semibold mb-2 text-foreground">My Flashcard Sets</h1>
+            <p className="text-muted-foreground">
+              Create, manage, and study your flashcards
+            </p>
+          </div>
 
           {sets.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-xl text-muted-foreground mb-6">
-                You don't have any flashcard sets yet
-              </p>
-              <Button onClick={handleCreateNew} size="lg" className="gap-2">
-                <Plus className="w-5 h-5" />
-                Create Your First Set
-              </Button>
+            <div className="text-center py-20 px-4">
+              <div className="max-w-md mx-auto">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Plus className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <h2 className="text-xl font-semibold mb-2">No flashcard sets yet</h2>
+                <p className="text-muted-foreground mb-8">
+                  Get started by creating your first flashcard set
+                </p>
+                <Button onClick={handleCreateNew} size="lg" className="gap-2">
+                  <Plus className="w-5 h-5" />
+                  Create Your First Set
+                </Button>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {sets.map((set) => (
                 <FlashcardSetCard
                   key={set.id}

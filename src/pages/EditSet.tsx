@@ -176,7 +176,7 @@ export default function EditSet() {
 
   if (loading) {
     return (
-      <div className="min-h-screen gradient-hero">
+      <div className="min-h-screen bg-background">
         <DashboardNav onCreateNew={() => navigate("/dashboard/create")} />
         <div className="flex items-center justify-center min-h-[60vh]">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -186,23 +186,23 @@ export default function EditSet() {
   }
 
   return (
-    <div className="min-h-screen gradient-hero">
+    <div className="min-h-screen bg-background">
       <DashboardNav onCreateNew={() => navigate("/dashboard/create")} />
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
         >
-          <h1 className="text-4xl font-bold mb-8">Edit Flashcard Set</h1>
+          <h1 className="text-3xl font-semibold mb-8">Edit Flashcard Set</h1>
 
-          <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
-            <Card className="glass">
+          <form onSubmit={form.handleSubmit(handleSave)} className="space-y-8">
+            <Card className="border border-border bg-card shadow-sm">
               <CardHeader>
-                <CardTitle>Set Details</CardTitle>
+                <CardTitle className="text-xl font-semibold">Set Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="title">Title *</Label>
                   <Input
@@ -229,9 +229,9 @@ export default function EditSet() {
               </CardContent>
             </Card>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Flashcards</h2>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold">Flashcards</h2>
                 <Button type="button" onClick={addFlashcard} variant="outline" className="gap-2">
                   <Plus className="w-4 h-4" />
                   Add Card
@@ -239,8 +239,8 @@ export default function EditSet() {
               </div>
 
               {flashcards.map((card, index) => (
-                <Card key={card.id} className="glass">
-                  <CardContent className="pt-6 space-y-4">
+                <Card key={card.id} className="border border-border bg-card shadow-sm">
+                  <CardContent className="pt-6 space-y-6">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-muted-foreground">
                         Card {index + 1}
