@@ -14,26 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
-      flashcard_sets: {
+      achievements: {
         Row: {
           created_at: string | null
           description: string | null
+          icon: string | null
+          id: string
+          name: string
+          requirement_type: string
+          requirement_value: number
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          requirement_type: string
+          requirement_value: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          requirement_type?: string
+          requirement_value?: number
+        }
+        Relationships: []
+      }
+      flashcard_set_categories: {
+        Row: {
+          category_id: string
+          created_at: string | null
+          set_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string | null
+          set_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string | null
+          set_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcard_set_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "set_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "flashcard_set_categories_set_id_fkey"
+            columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "flashcard_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flashcard_sets: {
+        Row: {
+          color_theme: string | null
+          created_at: string | null
+          description: string | null
+          difficulty: string | null
           id: string
           title: string
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          color_theme?: string | null
           created_at?: string | null
           description?: string | null
+          difficulty?: string | null
           id?: string
           title: string
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          color_theme?: string | null
           created_at?: string | null
           description?: string | null
+          difficulty?: string | null
           id?: string
           title?: string
           updated_at?: string | null
@@ -100,6 +169,30 @@ export type Database = {
         }
         Relationships: []
       }
+      set_categories: {
+        Row: {
+          color: string
+          created_at: string | null
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          color: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       study_progress: {
         Row: {
           confidence_level: number | null
@@ -134,6 +227,129 @@ export type Database = {
             columns: ["flashcard_id"]
             isOneToOne: false
             referencedRelation: "flashcards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_sessions: {
+        Row: {
+          accuracy_percentage: number | null
+          cards_studied: number
+          completed_at: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          set_id: string | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          accuracy_percentage?: number | null
+          cards_studied: number
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          set_id?: string | null
+          started_at: string
+          user_id: string
+        }
+        Update: {
+          accuracy_percentage?: number | null
+          cards_studied?: number
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          set_id?: string | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_sessions_set_id_fkey"
+            columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "flashcard_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_streaks: {
+        Row: {
+          created_at: string | null
+          current_streak: number | null
+          id: string
+          last_study_date: string | null
+          longest_streak: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_study_date?: string | null
+          longest_streak?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_study_date?: string | null
+          longest_streak?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_favorites: {
+        Row: {
+          created_at: string | null
+          set_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          set_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          set_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_set_id_fkey"
+            columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "flashcard_sets"
             referencedColumns: ["id"]
           },
         ]

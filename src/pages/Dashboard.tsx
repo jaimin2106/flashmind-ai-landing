@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
+import { DashboardAnalytics } from "@/components/dashboard/DashboardAnalytics";
 import { FlashcardSetCard } from "@/components/dashboard/FlashcardSetCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { FlashcardSet } from "@/types/flashcards";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -115,53 +116,87 @@ export default function Dashboard() {
     );
   }
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardNav onCreateNew={handleCreateNew} />
 
-      <div className="container mx-auto px-4 py-12 max-w-7xl">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="mb-12">
-            <h1 className="text-3xl font-semibold mb-2 text-foreground">My Flashcard Sets</h1>
-            <p className="text-muted-foreground">
-              Create, manage, and study your flashcards
+          {/* Welcome Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-2 text-foreground">
+              {getGreeting()}, {user?.email?.split('@')[0] || 'there'}! 👋
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Ready to continue your learning journey?
             </p>
           </div>
 
-          {sets.length === 0 ? (
-            <div className="text-center py-20 px-4">
-              <div className="max-w-md mx-auto">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Plus className="w-8 h-8 text-muted-foreground" />
+          {/* Analytics Section */}
+          <DashboardAnalytics />
+
+          {/* Main Content */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-foreground">Your Flashcard Sets</h2>
+              <Button onClick={handleCreateNew} size="lg" className="gap-2">
+                <Sparkles className="w-5 h-5" />
+                Create New Set
+              </Button>
+            </div>
+
+            {sets.length === 0 ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-20 px-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl border-2 border-dashed border-primary/20"
+              >
+                <div className="max-w-md mx-auto">
+                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Plus className="w-10 h-10 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-3 text-foreground">Start Your Journey</h2>
+                  <p className="text-muted-foreground mb-8 text-lg">
+                    Create your first flashcard set and begin mastering new topics
+                  </p>
+                  <Button onClick={handleCreateNew} size="lg" className="gap-2 text-lg px-8">
+                    <Sparkles className="w-5 h-5" />
+                    Create Your First Set
+                  </Button>
                 </div>
-                <h2 className="text-xl font-semibold mb-2">No flashcard sets yet</h2>
-                <p className="text-muted-foreground mb-8">
-                  Get started by creating your first flashcard set
-                </p>
-                <Button onClick={handleCreateNew} size="lg" className="gap-2">
-                  <Plus className="w-5 h-5" />
-                  Create Your First Set
-                </Button>
+              </motion.div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {sets.map((set, index) => (
+                  <motion.div
+                    key={set.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    <FlashcardSetCard
+                      set={set}
+                      cardCount={cardCounts[set.id] || 0}
+                      onStudy={handleStudy}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                    />
+                  </motion.div>
+                ))}
               </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {sets.map((set) => (
-                <FlashcardSetCard
-                  key={set.id}
-                  set={set}
-                  cardCount={cardCounts[set.id] || 0}
-                  onStudy={handleStudy}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          )}
+            )}
+          </div>
         </motion.div>
       </div>
 
