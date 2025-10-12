@@ -1,23 +1,23 @@
 import { motion } from "framer-motion";
-import { Edit, Play, Trash2, Star, MoreVertical, BookOpen } from "lucide-react";
+import { BookOpen, Calendar, Edit, Trash2, Heart, MoreVertical, Clock } from "lucide-react";
 import { FlashcardSet } from "@/types/flashcards";
 import { Button } from "@/components/ui/button";
-import { formatDistanceToNow } from "date-fns";
-import { ProgressRing } from "./ProgressRing";
-import { useState } from "react";
+import { ProgressBar } from "./ProgressBar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 interface FlashcardSetCardProps {
   set: FlashcardSet & { difficulty?: string; color_theme?: string };
   cardCount: number;
-  onStudy: (setId: string) => void;
-  onEdit: (setId: string) => void;
-  onDelete: (setId: string) => void;
+  onStudy: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 export function FlashcardSetCard({ set, cardCount, onStudy, onEdit, onDelete }: FlashcardSetCardProps) {
@@ -32,64 +32,68 @@ export function FlashcardSetCard({ set, cardCount, onStudy, onEdit, onDelete }: 
     "pastel-gradient-yellow",
   ];
   
-  const gradientClass = gradients[set.title.length % gradients.length];
-  const progress = cardCount > 0 ? Math.min(Math.floor((cardCount / 20) * 100), 100) : 0;
-  
-  const difficultyColors = {
-    easy: "bg-green-100 text-green-700 border-green-200",
-    medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    hard: "bg-red-100 text-red-700 border-red-200",
+  const gradient = set.color_theme 
+    ? `pastel-gradient-${set.color_theme}` 
+    : gradients[set.title.length % gradients.length];
+
+  const studiedCount = Math.floor(cardCount * 0.6); // Mock studied count
+  const progress = cardCount > 0 ? (studiedCount / cardCount) * 100 : 0;
+  const difficulty = set.difficulty || "medium";
+
+  const toggleFavorite = () => {
+    setIsFavorite(!isFavorite);
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4 }}
-      whileHover={{ 
-        y: -8, 
-        boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04)" 
-      }}
-      className={`group relative ${gradientClass} rounded-2xl p-6 border border-white/50 shadow-lg transition-all overflow-hidden`}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.2 }}
+      className={`${gradient} rounded-2xl p-6 border-2 border-white/50 shadow-lg hover:shadow-xl transition-all relative overflow-hidden group min-h-[420px] flex flex-col`}
     >
-      {/* Top accent border */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-white/60" />
+      {/* Subtle pattern overlay */}
+      <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_50%_120%,rgba(255,255,255,0.8),transparent_50%)]" />
       
-      {/* Pattern overlay */}
-      <div className="absolute inset-0 opacity-20" style={{
-        backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
-        backgroundSize: "20px 20px",
-      }} />
-
-      <div className="relative flex flex-col h-full">
-        {/* Header with actions */}
+      {/* Content */}
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Header */}
         <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            {set.difficulty && (
-              <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full border ${difficultyColors[set.difficulty as keyof typeof difficultyColors] || difficultyColors.medium} mb-2`}>
-                {set.difficulty}
-              </span>
-            )}
-          </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
-              className="p-1.5 bg-white/60 rounded-lg hover:bg-white/80 transition-colors"
+            <div className="p-2 bg-white/60 rounded-lg">
+              <BookOpen className="w-5 h-5 text-foreground" />
+            </div>
+            <Badge variant="secondary" className="text-xs font-medium">
+              {difficulty}
+            </Badge>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleFavorite}
+              className="h-8 w-8 hover:bg-white/60 transition-colors"
             >
-              <Star className={`w-4 h-4 ${isFavorite ? "fill-yellow-400 text-yellow-400" : "text-foreground/70"}`} />
-            </button>
+              <Heart
+                className={`w-4 h-4 transition-colors ${
+                  isFavorite ? "fill-red-500 text-red-500" : "text-foreground/60"
+                }`}
+              />
+            </Button>
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-1.5 bg-white/60 rounded-lg hover:bg-white/80 transition-colors">
-                  <MoreVertical className="w-4 h-4 text-foreground/70" />
-                </button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-white/60">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onEdit(set.id)}>
+                <DropdownMenuItem onClick={onEdit}>
                   <Edit className="w-4 h-4 mr-2" />
                   Edit
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onDelete(set.id)} className="text-destructive">
+                <DropdownMenuItem onClick={onDelete} className="text-destructive">
                   <Trash2 className="w-4 h-4 mr-2" />
                   Delete
                 </DropdownMenuItem>
@@ -98,42 +102,55 @@ export function FlashcardSetCard({ set, cardCount, onStudy, onEdit, onDelete }: 
           </div>
         </div>
 
-        {/* Content */}
+        {/* Title & Description */}
         <div className="flex-1 mb-4">
-          <h3 className="text-xl font-bold mb-2 text-foreground line-clamp-2">
+          <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2 leading-tight tracking-tight min-h-[3.5rem]">
             {set.title}
           </h3>
           {set.description && (
-            <p className="text-sm text-foreground/70 line-clamp-3 leading-relaxed">
+            <p className="text-sm text-foreground/70 line-clamp-3 leading-relaxed min-h-[4rem]">
               {set.description}
             </p>
           )}
         </div>
 
-        {/* Progress and Stats */}
-        <div className="flex items-center justify-between mb-4 pb-4 border-t border-white/40 pt-4">
-          <div className="flex items-center gap-3">
-            <ProgressRing progress={progress} size={50} strokeWidth={5} />
-            <div>
-              <div className="flex items-center gap-1.5 text-foreground font-semibold">
-                <BookOpen className="w-4 h-4" />
-                <span className="text-lg">{cardCount}</span>
-                <span className="text-sm font-normal text-foreground/70">cards</span>
-              </div>
-              <p className="text-xs text-foreground/60">
-                {formatDistanceToNow(new Date(set.updated_at), { addSuffix: true })}
-              </p>
+        {/* Progress Section */}
+        <div className="mb-4">
+          <ProgressBar progress={progress} showPercentage={true} />
+          <div className="flex items-center justify-between mt-3 text-xs text-foreground/60">
+            <div className="flex items-center gap-1">
+              <BookOpen className="w-3 h-3" />
+              <span>{studiedCount} of {cardCount} studied</span>
             </div>
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              <span>5 min remaining</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="bg-white/40 backdrop-blur-sm rounded-lg p-3">
+            <p className="text-2xl font-bold text-foreground tabular-nums">{cardCount}</p>
+            <p className="text-xs text-foreground/60 font-medium">Cards</p>
+          </div>
+          <div className="bg-white/40 backdrop-blur-sm rounded-lg p-3">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-foreground/60" />
+              <p className="text-xs text-foreground/60 font-medium">Last studied</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground mt-1">
+              {new Date(set.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </p>
           </div>
         </div>
 
         {/* Action Button */}
         <Button
-          onClick={() => onStudy(set.id)}
-          className="w-full bg-white/80 hover:bg-white text-foreground font-semibold shadow-md"
-          size="lg"
+          onClick={onStudy}
+          className="w-full bg-white/80 hover:bg-white text-foreground font-semibold shadow-md hover:shadow-lg transition-all"
         >
-          <Play className="w-5 h-5 mr-2" />
           Start Studying
         </Button>
       </div>

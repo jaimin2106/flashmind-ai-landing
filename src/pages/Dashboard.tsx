@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { DashboardNav } from "@/components/dashboard/DashboardNav";
-import { DashboardAnalytics } from "@/components/dashboard/DashboardAnalytics";
-import { FlashcardSetCard } from "@/components/dashboard/FlashcardSetCard";
+import { useNavigate } from "react-router-dom";
+import { Plus, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { FlashcardSet } from "@/types/flashcards";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import { Loader2, Plus, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { FlashcardSetCard } from "@/components/dashboard/FlashcardSetCard";
+import { DashboardNav } from "@/components/dashboard/DashboardNav";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,15 +17,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
+import { DashboardAnalytics } from "@/components/dashboard/DashboardAnalytics";
+import { QuickActionsPanel } from "@/components/dashboard/QuickActionsPanel";
+import { SearchFilterBar } from "@/components/dashboard/SearchFilterBar";
+import { StudyGoals } from "@/components/dashboard/StudyGoals";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [sets, setSets] = useState<FlashcardSet[]>([]);
+  const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[]>([]);
   const [cardCounts, setCardCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [setToDelete, setSetToDelete] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("recent");
 
   useEffect(() => {
     loadFlashcardSets();
@@ -43,7 +48,7 @@ export default function Dashboard() {
 
       if (setsError) throw setsError;
 
-      setSets(setsData || []);
+      setFlashcardSets(setsData || []);
 
       // Load card counts for each set
       const counts: Record<string, number> = {};
@@ -59,7 +64,11 @@ export default function Dashboard() {
       }
       setCardCounts(counts);
     } catch (error: any) {
-      toast.error("Failed to load flashcard sets");
+      toast({
+        title: "Error",
+        description: "Failed to load flashcard sets",
+        variant: "destructive",
+      });
       console.error(error);
     } finally {
       setLoading(false);
@@ -94,10 +103,17 @@ export default function Dashboard() {
 
       if (error) throw error;
 
-      toast.success("Flashcard set deleted");
+      toast({
+        title: "Success",
+        description: "Flashcard set deleted successfully",
+      });
       loadFlashcardSets();
     } catch (error: any) {
-      toast.error("Failed to delete flashcard set");
+      toast({
+        title: "Error",
+        description: "Failed to delete flashcard set",
+        variant: "destructive",
+      });
       console.error(error);
     } finally {
       setDeleteDialogOpen(false);
@@ -105,108 +121,124 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <DashboardNav onCreateNew={handleCreateNew} />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      </div>
-    );
-  }
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
+  const filteredSets = flashcardSets.filter((set) =>
+    set.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    set.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen dashboard-bg">
       <DashboardNav onCreateNew={handleCreateNew} />
-
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {/* Welcome Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-foreground">
-              {getGreeting()}, {user?.email?.split('@')[0] || 'there'}! 👋
+      
+      {loading ? (
+        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <h1 className="text-5xl font-bold mb-3 tracking-tight text-balance">
+              Welcome back, {user?.email?.split('@')[0]}! 👋
             </h1>
             <p className="text-lg text-muted-foreground">
               Ready to continue your learning journey?
             </p>
-          </div>
+          </motion.div>
 
-          {/* Analytics Section */}
+          {/* Analytics */}
           <DashboardAnalytics />
 
+          {/* Study Goals */}
+          <StudyGoals />
+
+          {/* Quick Actions */}
+          <QuickActionsPanel onCreateNew={handleCreateNew} />
+
           {/* Main Content */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-foreground">Your Flashcard Sets</h2>
-              <Button onClick={handleCreateNew} size="lg" className="gap-2">
-                <Sparkles className="w-5 h-5" />
+          <div className="space-y-6">
+            {/* Header with Create Button */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold tracking-tight">Your Flashcard Sets</h2>
+              <Button
+                onClick={handleCreateNew}
+                size="lg"
+                className="gap-2 shadow-lg hover:shadow-xl transition-all"
+              >
+                <Plus className="w-5 h-5" />
                 Create New Set
               </Button>
             </div>
 
-            {sets.length === 0 ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-20 px-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-3xl border-2 border-dashed border-primary/20"
+            {/* Search & Filter */}
+            <SearchFilterBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+            />
+
+            {/* Flashcard Sets Grid */}
+            {filteredSets.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-16 px-4"
               >
-                <div className="max-w-md mx-auto">
+                <div className="max-w-md mx-auto bg-card rounded-2xl p-8 shadow-lg border border-border">
                   <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Plus className="w-10 h-10 text-primary" />
+                    <BookOpen className="w-10 h-10 text-primary" />
                   </div>
-                  <h2 className="text-2xl font-bold mb-3 text-foreground">Start Your Journey</h2>
-                  <p className="text-muted-foreground mb-8 text-lg">
-                    Create your first flashcard set and begin mastering new topics
+                  <h3 className="text-2xl font-bold mb-3 tracking-tight">
+                    {searchQuery ? "No sets found" : "No flashcard sets yet"}
+                  </h3>
+                  <p className="text-muted-foreground mb-6 leading-relaxed">
+                    {searchQuery
+                      ? "Try adjusting your search or filters"
+                      : "Create your first flashcard set to start learning!"}
                   </p>
-                  <Button onClick={handleCreateNew} size="lg" className="gap-2 text-lg px-8">
-                    <Sparkles className="w-5 h-5" />
-                    Create Your First Set
-                  </Button>
+                  {!searchQuery && (
+                    <Button
+                      onClick={handleCreateNew}
+                      size="lg"
+                      className="gap-2 shadow-md"
+                    >
+                      <Plus className="w-5 h-5" />
+                      Create Your First Set
+                    </Button>
+                  )}
                 </div>
               </motion.div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {sets.map((set, index) => (
-                  <motion.div
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredSets.map((set) => (
+                  <FlashcardSetCard
                     key={set.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                  >
-                    <FlashcardSetCard
-                      set={set}
-                      cardCount={cardCounts[set.id] || 0}
-                      onStudy={handleStudy}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                    />
-                  </motion.div>
+                    set={set}
+                    cardCount={cardCounts[set.id] || 0}
+                    onStudy={() => handleStudy(set.id)}
+                    onEdit={() => handleEdit(set.id)}
+                    onDelete={() => handleDelete(set.id)}
+                  />
                 ))}
               </div>
             )}
           </div>
-        </motion.div>
-      </div>
+        </div>
+      )}
 
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Flashcard Set</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this flashcard set? This action cannot be undone
-              and will delete all flashcards in this set.
+              This action cannot be undone. This will permanently delete the
+              flashcard set and all its cards.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

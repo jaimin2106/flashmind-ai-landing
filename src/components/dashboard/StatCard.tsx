@@ -52,23 +52,25 @@ export function StatCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}
-      whileHover={{ y: -4, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
-      className={`${gradient} rounded-2xl p-6 border border-white/50 shadow-lg transition-all`}
+      whileHover={{ y: -4 }}
+      className={`${gradient} rounded-2xl p-6 border-2 border-white/50 shadow-lg hover:shadow-xl transition-all`}
     >
       <div className="flex items-start justify-between mb-4">
-        <div className="p-3 bg-white/60 rounded-xl">
+        <div className="p-3 bg-white/70 rounded-xl shadow-sm">
           <Icon className="w-6 h-6 text-foreground" />
         </div>
         {trend && (
-          <span className="text-sm font-medium text-foreground/70">{trend}</span>
+          <span className="text-xs font-semibold text-foreground/70 px-2 py-1 bg-white/50 rounded-full">
+            {trend}
+          </span>
         )}
       </div>
       
-      <div className="space-y-1">
-        <p className="text-sm font-medium text-foreground/70">{label}</p>
-        <p className="text-3xl font-bold text-foreground tabular-nums">
+      <div className="space-y-2">
+        <p className="text-sm font-semibold text-foreground/70 uppercase tracking-wide">{label}</p>
+        <p className="text-4xl font-bold text-foreground tabular-nums tracking-tight">
           {loading ? "..." : displayValue}
-          {suffix}
+          {suffix && <span className="text-2xl ml-1">{suffix}</span>}
         </p>
       </div>
     </motion.div>

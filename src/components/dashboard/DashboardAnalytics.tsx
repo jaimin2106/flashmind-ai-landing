@@ -101,24 +101,19 @@ export function DashboardAnalytics() {
   ];
 
   return (
-    <div className="mb-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <h2 className="text-2xl font-semibold mb-6 text-foreground">Your Progress</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statsData.map((stat, index) => (
-            <StatCard
-              key={stat.label}
-              {...stat}
-              loading={loading}
-              delay={index * 0.1}
-            />
-          ))}
-        </div>
-      </motion.div>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="mb-10"
+    >
+      <h2 className="text-3xl font-bold mb-6 tracking-tight">Your Progress</h2>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {statsData.map((stat, index) => (
+          <StatCard key={stat.label} {...stat} loading={loading} delay={index * 0.1} />
+        ))}
+      </div>
+    </motion.div>
   );
 }
