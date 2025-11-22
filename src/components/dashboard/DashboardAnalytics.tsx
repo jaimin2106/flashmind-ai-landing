@@ -74,28 +74,28 @@ export function DashboardAnalytics() {
       label: "Flashcard Sets",
       value: stats.totalSets,
       icon: Library,
-      gradient: "pastel-gradient-lavender",
+      gradient: "linear-gradient(135deg, hsl(var(--accent-blue)), hsl(var(--primary)))",
       trend: "+12%",
     },
     {
       label: "Total Cards",
       value: stats.totalCards,
       icon: BookOpen,
-      gradient: "pastel-gradient-mint",
+      gradient: "linear-gradient(135deg, hsl(var(--accent-success)), hsl(142 70% 55%))",
       trend: "+8%",
     },
     {
       label: "Cards Studied",
       value: stats.cardsStudied,
       icon: TrendingUp,
-      gradient: "pastel-gradient-peach",
+      gradient: "linear-gradient(135deg, hsl(var(--accent-amber)), hsl(28 92% 64%))",
       trend: "+23%",
     },
     {
       label: "Study Streak",
       value: stats.currentStreak,
       icon: Flame,
-      gradient: "pastel-gradient-coral",
+      gradient: "linear-gradient(135deg, hsl(var(--accent-error)), hsl(4 90% 68%))",
       suffix: " days",
     },
   ];
@@ -105,11 +105,13 @@ export function DashboardAnalytics() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="mb-10"
+      className="space-y-6"
     >
-      <h2 className="text-3xl font-bold mb-6 tracking-tight">Your Progress</h2>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div>
+        <h2 className="text-4xl font-bold tracking-tight text-display mb-2">Your Progress</h2>
+        <p className="text-muted-foreground">Track your learning journey and achievements</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statsData.map((stat, index) => (
           <StatCard key={stat.label} {...stat} loading={loading} delay={index * 0.1} />
         ))}
