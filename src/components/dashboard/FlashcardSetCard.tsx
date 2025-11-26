@@ -85,8 +85,8 @@ export function FlashcardSetCard({
         <div className="mt-auto space-y-4">
           <ProgressBar 
             progress={progressPercentage}
-            total={cardCount}
-            studied={Math.round((progressPercentage / 100) * cardCount)}
+            label="Progress"
+            showPercentage={true}
           />
 
           {/* Metadata */}
